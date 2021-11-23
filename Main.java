@@ -18,12 +18,16 @@ public class Main {
         // viewImageData(imageData);
 
         // trims boarder of image
-        // int[][] trimmed = trimBorders(imageData, 300);
-        // twoDToImage(trimmed, "src/images/trimmed_apple.jpg");
+        int[][] trimmed = trimBorders(imageData, 305);
+        twoDToImage(trimmed, "src/images/trimmed_apple.jpg");
 
         // negative color change image
         int[][] negativeImg = negativeColor(imageData);
         twoDToImage(negativeImg, "src/images/negativeImg.jpg");
+
+        // flip image upside down
+        int[][] flippedImg = invertImage(imageData);
+        twoDToImage(flippedImg, "src/images/flippedImg.jpg");
 
 
 
@@ -76,9 +80,15 @@ public class Main {
         return null;
     }
 
-
+    // flips image upside down
     public static int[][] invertImage(int[][] imageTwoD) {
-        return null;
+        int[][] flippedImg = new int[imageTwoD.length][imageTwoD[0].length];
+        for (int i = 0; i < imageTwoD.length; i++) {
+            for (int j = 0; j < imageTwoD[0].length; j++) {
+                flippedImg[i][j] = imageTwoD[(imageTwoD.length - 1) - i][j];
+            }
+        }
+        return flippedImg;
     }
 
 
