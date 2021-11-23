@@ -21,7 +21,7 @@ public class Main {
         // int[][] trimmed = trimBorders(imageData, 300);
         // twoDToImage(trimmed, "src/images/trimmed_apple.jpg");
 
-        // negative color change
+        // negative color change image
         int[][] negativeImg = negativeColor(imageData);
         twoDToImage(negativeImg, "src/images/negativeImg.jpg");
 
