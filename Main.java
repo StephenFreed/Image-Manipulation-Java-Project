@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-
+import java.util.Random;
 
 // ~~~~~~~~~~~~ Main Method Below ~~~~~~~~~~~~
 
@@ -18,7 +18,7 @@ public class Main {
         // viewImageData(imageData);
 
         // trims boarder of image
-        int[][] trimmed = trimBorders(imageData, 305);
+        int[][] trimmed = trimBorders(imageData, 100);
         twoDToImage(trimmed, "src/images/trimmed_apple.jpg");
 
         // negative color change image
@@ -29,12 +29,38 @@ public class Main {
         int[][] flippedImg = invertImage(imageData);
         twoDToImage(flippedImg, "src/images/flippedImg.jpg");
 
+        // stretch image horizontally
+        int[][] stretchHorizontallyImg = stretchHorizontally(imageData);
+        twoDToImage(stretchHorizontallyImg, "src/images/stretchHorizontallyImg.jpg");
 
+        // stretch image vertically
+        int[][] shrinkVertically = shrinkVertically(imageData);
+        twoDToImage(shrinkVertically, "src/images/shrinkVertically.jpg");
 
-        // int[][] allFilters = stretchHorizontally(shrinkVertically(colorFilter(negativeColor(trimBorders(invertImage(imageData), 50)), 200, 20, 40)));
+        // stretch image vertically
+        int[][] colorFilterImg = colorFilter(imageData, 90, 80, 30);
+        twoDToImage(colorFilterImg, "src/images/colorFilterImg.jpg");
+
+        // all filters on the same image
+        int[][] allFilters = stretchHorizontally(shrinkVertically(colorFilter(negativeColor(trimBorders(invertImage(imageData), 50)), 200, 20, 40)));
+        twoDToImage(allFilters, "src/images/allFilters.jpg");
+
+        // paint random image
+        int[][] newCanvas = new int[500][500];
+        int[][] paintRandomCanvas = paintRandomImage(newCanvas);
+        twoDToImage(paintRandomCanvas, "src/images/paintRandomCanvas.jpg");
+
+        // paint rectangle on image
+        int[] rgba = {255,255,0,255};
+        int colorInt = getColorIntValFromRGBA(rgba);
+        int[][] paintRectangleImg = paintRectangle(imageData,300,200,200,150, colorInt);
+        twoDToImage(paintRectangleImg, "src/images/paintRectangleImg.jpg");
+
+        // generate many random rectangles
+        int[][] generatedRectangleImg = generateRectangles(imageData, 500);
+        twoDToImage(generatedRectangleImg, "src/images/generatedRectangleImg.jpg");
+
     }
-
-
 
     // ~~~~~~~~~~~~ Image Methods Below ~~~~~~~~~~~~
 
@@ -54,8 +80,7 @@ public class Main {
         }
     }
 
-
-    //
+    // negative version of Image
     public static int[][] negativeColor(int[][] imageTwoD) {
         int[][] negativeImg = new int[imageTwoD.length][imageTwoD[0].length];
         for (int i = 0; i < imageTwoD.length; i++) {
@@ -70,14 +95,28 @@ public class Main {
         return negativeImg;
     }
 
-
+    // stretch image horizontally
     public static int[][] stretchHorizontally(int[][] imageTwoD) {
-        return null;
+        int[][] stretchedImg = new int[imageTwoD.length][imageTwoD[0].length * 2];
+        for (int i = 0; i < imageTwoD.length; i++) {
+            for (int j = 0; j < imageTwoD[i].length; j++) {
+                int it = j * 2;
+                stretchedImg[i][it] = imageTwoD[i][j];
+                stretchedImg[i][it + 1] = imageTwoD[i][j];
+            }
+        }
+        return stretchedImg ;
     }
 
-
+    // shrink image vertically
     public static int[][] shrinkVertically(int[][] imageTwoD) {
-        return null;
+        int[][] stretchedImg = new int[imageTwoD.length / 2][imageTwoD[0].length];
+        for (int i = 0; i < imageTwoD.length; i++) {
+            for (int j = 0; j < imageTwoD[0].length; j++) {
+                stretchedImg[i/2][j] = imageTwoD[i][j];
+            }
+        }
+        return stretchedImg ;
     }
 
     // flips image upside down
@@ -91,32 +130,75 @@ public class Main {
         return flippedImg;
     }
 
-
+    // add filter based on rgb inputs
     public static int[][] colorFilter(int[][] imageTwoD, int redChangeValue, int greenChangeValue, int blueChangeValue) {
-        return null;
+        int[][] filteredImg = new int[imageTwoD.length][imageTwoD[0].length];
+        int[] changes = new int[] {redChangeValue, greenChangeValue, blueChangeValue};
+        for (int i = 0; i < imageTwoD.length; i++) {
+            for (int j = 0; j < imageTwoD[0].length; j++) {
+                int[] rgba = getRGBAFromPixel(imageTwoD[i][j]);
+                for (int k = 0; k < 3; k++) {
+                    int newValue = rgba[k] + changes[k];
+                    if (newValue < 0) {
+                        rgba[k] = 0;
+                    }
+                    else if (newValue > 255) {
+                        rgba[k] = 255;
+                    }
+                    else {
+                        rgba[k] = newValue;
+                    }
+                    filteredImg[i][j] = getColorIntValFromRGBA(rgba);
+                }
+            }
+        }
+        return filteredImg;
     }
 
+    // ~~~~~~~~~~~~ Painting Methods ~~~~~~~~~~~~
 
-
-    // Painting Methods
+    // paints random image
     public static int[][] paintRandomImage(int[][] canvas) {
-        // TODO: Fill in the code for this method
-        return null;
+        Random random = new Random();
+        for (int i = 0; i < canvas.length; i++) {
+            for (int j = 0; j < canvas[0].length; j++) {
+                int[] randNums = {random.nextInt(256), random.nextInt(256), random.nextInt(256), 255};
+                canvas[i][j] = getColorIntValFromRGBA(randNums);
+            }
+        }
+        return canvas;
     }
 
-
+    // paint rectangle on image
     public static int[][] paintRectangle(int[][] canvas, int width, int height, int rowPosition, int colPosition, int color) {
-        // TODO: Fill in the code for this method
-        return null;
+        int[][] squareImg = new int[canvas.length][canvas[0].length];
+        for (int i = 0; i < canvas.length; i++) {
+            for (int j = 0; j < canvas[0].length; j++) {
+                if (i >= rowPosition && i <= rowPosition + height && j >= colPosition && j <= colPosition + width) {
+                    squareImg[i][j] = color;
+                }
+                else {
+                    squareImg[i][j] = canvas[i][j];
+                }
+            }
+        }
+        return squareImg;
     }
 
-
+    // generate random rectangles on image
     public static int[][] generateRectangles(int[][] canvas, int numRectangles) {
-        // TODO: Fill in the code for this method
-        return null;
+        Random random = new Random();
+        for (int i = 0; i < numRectangles; i++) {
+            int randHeight = random.nextInt(canvas.length);
+            int randWidth = random.nextInt(canvas[0].length);
+            int row = canvas.length - randHeight;
+            int col = canvas[0].length - randWidth;
+            int[] randRGB = {random.nextInt(256), random.nextInt(256), random.nextInt(256), 255};
+            int randColor = getColorIntValFromRGBA(randRGB);
+            canvas = paintRectangle(canvas, randWidth, randHeight, row, col, randColor);
+        }
+        return canvas;
     }
-
-
 
     // ~~~~~~~~~~~~ Utility Methods Below ~~~~~~~~~~~~
 
@@ -148,7 +230,6 @@ public class Main {
         }
     }
 
-
     // accepts 2D array and file name // converts 2D array to image
     public static void twoDToImage(int[][] imgData, String fileName) {
         try {
@@ -167,13 +248,11 @@ public class Main {
         }
     }
 
-
     // accepts int value representing hexadecimal value // return 4 element int array
     public static int[] getRGBAFromPixel(int pixelColorValue) {
         Color pixelColor = new Color(pixelColorValue);
         return new int[] { pixelColor.getRed(), pixelColor.getGreen(), pixelColor.getBlue(), pixelColor.getAlpha() };
     }
-
 
     // accepts array of ints representing RGBA values // returns int representing the pixel hexadecimal value
     public static int getColorIntValFromRGBA(int[] colorData) {
@@ -185,7 +264,6 @@ public class Main {
             return -1;
         }
     }
-
 
     // extracts 3x3 section from top left of image // used to view the structure of the image data
     public static void viewImageData(int[][] imageTwoD) {
@@ -214,7 +292,4 @@ public class Main {
         }
     }
 
-
-
 }
-
