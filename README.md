@@ -9,8 +9,6 @@
 
 #### The integer arrays are finally converted back to an image and output to file.
 
-<br />
-
 # Example Original Image
 ![](./images/apple.jpg)
 
